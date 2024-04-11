@@ -1,0 +1,11 @@
+[project]
+dependencies = [
+    "pandas>=2.2.0",
+    "kaggle>=1.6.8",
+    "scikit-learn>=1.4.2",
+    "numpy>=1.26.4"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
