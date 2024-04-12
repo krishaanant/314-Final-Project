@@ -40,12 +40,26 @@ def filter_adults(remove_cols : pd.DataFrame) -> pd.DataFrame:
     filter = remove_cols['age'] >= 18
     return remove_cols[filter]
 
-def logistic_regression(x, y):
+def logistic_regression(X, y):
+    X_train, X_test, y_train, y_test = test_train_split(X, y, test_size = 0.2, stratify = y, random_state= 4)
     model = LogisticRegression(solver='liblinear', random_state=0)
-    model.fit(x,y)
-    model.predict(x)
+    model.fit(X_train,y_train)
+    y_pred = model.predict(X_test)
+    acc = model.score(X_test, y_test)
+    return y_test, y_pred, acc
+
+def plot_cm(y_test, y_pred):
+    cm = confusion_matrix(y_test, y_pred)
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(cm)
+    ax.grid(False)
+    ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted 0s', 'Predicted 1s'))
+    ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual 0s', 'Actual 1s'))
+    ax.set_ylim(1.5, -0.5)
+    for i in range(2):
+        for j in range(2):
+            ax.text(j, i, cm[i, j], ha='center', va='center', color='red')
+    plt.show()
 
 
-
-
-
+data = data()
