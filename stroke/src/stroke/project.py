@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
+from matplotlib import pyplot as plt
 
 
 def data():
@@ -14,34 +15,34 @@ def data():
     return data
 
 
-def drop_na(data) -> pd.DataFrame:
-    newData = data.dropna()
+def drop_na(df) -> pd.DataFrame:
+    newData = df.dropna()
     return newData
 
 
-def make_binary(drop_na):
+def make_binary(df):
     data_cols = ['gender', 'ever_married']
     for data_col in data_cols:
-        unique = drop_na[data_col].unique().tolist()
-        for index, value in drop_na[data_col].items():
+        unique = df[data_col].unique().tolist()
+        for index, value in df[data_col].items():
             if value in unique:
-                drop_na.at[index, data_col] = int(unique.index(value))
-        drop_na[data_col] = drop_na[data_col].astype(int)
-    return drop_na
+                df.at[index, data_col] = int(unique.index(value))
+        df[data_col] = df[data_col].astype(int)
+    return df
 
 
-def remove_cols(make_binary: pd.DataFrame) -> pd.DataFrame:
-    col_list = ["id", "smoking_status"]
-    data = make_binary.drop(col_list, axis = 1)
+def remove_cols(df: pd.DataFrame) -> pd.DataFrame:
+    col_list = ["id", "smoking_status", "Residence_type", "work_type"]
+    data = df.drop(col_list, axis = 1)
     return data
 
 
-def filter_adults(remove_cols : pd.DataFrame) -> pd.DataFrame:
-    filter = remove_cols['age'] >= 18
-    return remove_cols[filter]
+def filter_adults(df) -> pd.DataFrame:
+    filter = df['age'] >= 18
+    return df[filter]
 
 def logistic_regression(X, y):
-    X_train, X_test, y_train, y_test = test_train_split(X, y, test_size = 0.2, stratify = y, random_state= 4)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, stratify = y, random_state= 4)
     model = LogisticRegression(solver='liblinear', random_state=0)
     model.fit(X_train,y_train)
     y_pred = model.predict(X_test)
@@ -63,3 +64,17 @@ def plot_cm(y_test, y_pred):
 
 
 data = data()
+print(data)
+
+
+data = drop_na(data)
+data = make_binary(data)
+data = remove_cols(data)
+data = filter_adults(data)
+data = data[data.gender != 2]
+X = data.drop(columns = ["stroke"])
+y_test, y_pred, acc = logistic_regression(X, data["stroke"])
+print(acc)
+
+plot_cm(y_test, y_pred)
+
